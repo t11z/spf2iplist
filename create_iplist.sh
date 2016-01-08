@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # functions
-function usage() {
+usage() {
     echo "usage: $(basename $0) [-i path] [-o path] [-n address] [-d]"
     echo "          -i use file defined by path as input file for domains to resolve"
     echo "          -o use file defined by path as output file for ip-addresses"
@@ -9,32 +9,32 @@ function usage() {
     echo "          -d debug mode"
 }
 
-function reset() {
-    if [ "$debug" = "1" ]; then echo "reset($*)"; fi
+reset()
+{
+    if [ "$debug" = "1" ]; then echo "reset($*) " >&2; fi
     local outfile=$1
     rm -f $outfile
     touch $outfile
 }
 
-function addspf() {
-    if [ "$debug" = "1" ]; then echo "addspf($*)"; fi
-    local ip=""
-    local domainspf=$1
+addspf() {
+    if [ "$debug" = "1" ]; then echo "addspf($*) " >&2; fi
+    ip=""
+    domainspf=$1
     for spf in $(dig $dnsserver $domainspf TXT +short | grep spf | tr " " "\n" | sed 's/\"//'); do
         case $spf in
             a)
                 ip=$(dig $dnsserver $domainspf A +short)
-                if [ "$debug" = "1" ]; then echo "adding ip: $ip"; fi
+                if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
             ;;
             a:*)
                 ip=$(dig $dnsserver $(dig $dnsserver $domainspf TXT +short | tr " " "\n" | grep "a\:.*" | cut -d ":" -f 2) A +short)
-                if [ "$debug" = "1" ]; then echo "adding ip: $ip"; fi
+                if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
             ;;
             mx)
-                mx=($(dig $dnsserver $domainspf MX +short | cut -d " " -f 2))
-                for key in "${!mx[@]}"; do 
-                    ip="$(dig $dnsserver ${mx[$key]} A +short)"
-                    if [ "$debug" = "1" ]; then echo "adding ip: $ip"; fi
+                for mx in $(dig $dnsserver $domainspf MX +short | cut -d " " -f 2); do
+                    ip="$(dig $dnsserver $mx A +short)"
+                    if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
                 done
             ;;
             include:*) 
@@ -46,11 +46,11 @@ function addspf() {
             ;;
             ip4:*) 
                 ip=${spf#ip4:}
-                if [ "$debug" = "1" ]; then echo "adding ip: $ip"; fi
+                if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
             ;;
             ip6:*)
                 ip=${spf#ip6:}
-                if [ "$debug" = "1" ]; then echo "adding ip: $ip"; fi
+                if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
             ;;
         esac
         if [ "$ip" != "" ]; then echo $ip >> $ipsfile; fi 

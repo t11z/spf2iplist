@@ -8,6 +8,7 @@ little script to create ip-address list from DNS TXT records used for Sender Pol
 ## Limitations
 
 * No validation whatsoever. If a nameserver administrator is announcing broken SPF-TXT records, it will likely break your iplist.
+* Currently prefixes are only supported in ip4 or ip6 directives
 * Currently redirect SPF directive is not supported. 
 
 ## Usage

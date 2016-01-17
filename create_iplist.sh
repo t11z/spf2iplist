@@ -52,6 +52,9 @@ addspf() {
                 ip=${spf#ip6:}
                 if [ "$debug" = "1" ]; then echo "adding ip: $ip " >&2; fi
             ;;
+            -*)
+                if [ "$debug" = "1" ]; then echo "omitting: ${spf#-} " >&2; fi
+            ;;
         esac
         if [ "$ip" != "" ]; then echo $ip >> $ipsfile; fi 
     done
